@@ -3,7 +3,7 @@ library(monitoR)
 library(plyr) 
 
 
-#Create template from existing audio files
+#Create templates from existing audio files
 WOFRITemplate1 <- makeBinTemplate("WOFRITemplate1.WAV", 
                                   t.lim = c(241.59,241.69),
                                   frq.lim = c(0,6),
