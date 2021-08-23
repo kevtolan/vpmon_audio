@@ -3,7 +3,7 @@ library(monitoR)
 library(plyr) 
 
 
-#Create template
+#Create template from existing audio files
 WOFRITemplate1 <- makeBinTemplate("WOFRITemplate1.WAV", 
                                   t.lim = c(241.59,241.69),
                                   frq.lim = c(0,6),
@@ -40,7 +40,7 @@ BinTemplateList <- combineBinTemplates(WOFRITemplate1,WOFRITemplate2,WOFRITempla
 CorTemplateList <-combineCorTemplates(BADOTemplate)
 
 
-Analyze files
+#Detect audio
 
 x <- "pathname to audio file"
 
@@ -54,3 +54,18 @@ CorMatch <- corMatch(x,CorTemplateList,
                              #show.prog = TRUE,cor.method = "pearson",time.source = "fileinfo",
                              #rec.tz = "US/Eastern")
 CorDetects <- findPeaks(CorMatch, frame = 1.01)
+
+ 
+# view number of detections
+
+WOFRITemplate1_Detects <- nrow(BinDetects@detections[["WOFRITemplate1"]])
+WOFRITemplate2_Detects <- nrow(BinDetects@detections[["WOFRITemplate2"]])
+WOFRITemplate3_Detects <- nrow(BinDetects@detections[["WOFRITemplate3"]])
+SPPEI_Detects <- nrow(BinDetects@detections[["SPPEITemplate"]])
+BADO_Detects <-nrow(CorDetects@detections[["BADOTemplate"]])
+
+WOFRITemplate1_Detects
+WOFRITemplate2_Detects
+WOFRITemplate3_Detects
+SPPEI_Detects
+BADO_Detects
