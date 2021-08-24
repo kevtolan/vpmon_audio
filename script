@@ -1,7 +1,10 @@
+# download audio templates drive.google.com/drive/folders/1R6VjI1TQPksERSB0YAKoBwg7S9EhSQXM
+
 library(tuneR)
 library(monitoR)
 library(plyr) 
 
+setwd()
 
 #Create templates from existing audio files
 WOFRITemplate1 <- makeBinTemplate("WOFRITemplate1.WAV", 
@@ -42,8 +45,7 @@ CorTemplateList <-combineCorTemplates(BADOTemplate)
 
 #Detect audio
 
-x <- "pathname to audio file"
-
+x <- "pathname to target audio file"
 
 BinMatch <- binMatch(x, BinTemplateList,
                               show.prog = TRUE,cor.method = "pearson",time.source = "fileinfo",
