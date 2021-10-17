@@ -4,13 +4,13 @@ library(AMModels)
 #set recorder ID
 VPMonID <- "ABC123"
 
-#create directories, reset WD
+#create directories, reset WD, run once
 ammCreateDirectories(amm.dir.name = "paste0(VPMonID,'_AMMonitor)", 
                      file.path = "______")
 
 setwd('')
 
-# Create/save libraries and add metadata
+# Create/save libraries and add metadata, run once
 classifiers <- AMModels::amModelLib(description = "This library stores classification models (machine learning models) that can be used to predict the probability that a detected signal is from a target species.")
 soundscape <- AMModels::amModelLib(description = "This library stores results of a soundscape analysis.")
 info <- list(PI = 'Steve Faccio',
@@ -33,8 +33,7 @@ RSQLite::dbExecute(conn = conx, statement = "PRAGMA foreign_keys = ON;")
 #view tables
 dbReadTable(conx,people)
 
-#### Add necessary components ####
-
+#### Add necessary components ####, run once per record added
 #people
 add.people <- data.frame(personID = 'ktolan@vtecostudies.org',
                          firstName = 'Kevin',
@@ -175,7 +174,7 @@ new.schedule <- data.frame(equipmentID = '',
 RSQLite::dbWriteTable(conn = conx, name = 'schedule', value = new.schedule,
                       row.names = FALSE, overwrite = FALSE,
                       append = TRUE, header = FALSE)
-# file rename
+# file rename. put any files u want run into the recoring_drop folder. ensure in proper format, this is good for AudioMoths
 AudioFiles <- list.files(path = "recording_drop", pattern = ".WAV", all.files = TRUE,
                          full.names = TRUE, recursive = TRUE,
                          ignore.case = TRUE, include.dirs = TRUE)
@@ -186,15 +185,14 @@ AudioFiles5 <- str_replace_all(AudioFiles4,':','-')
 AudioFiles6 <- paste0(VPMonID, AudioFiles5)
 AudioFiles7 <- str_replace_all(AudioFiles6,'~','recording_drop/')
 AudioFiles8 <- file.rename(AudioFiles,paste0(AudioFiles7,'.wav'))
-# fill recordings table
+# fill recordings table with files recording_drop, moves them to recordings
 dropboxMoveBatch(db.path = db.path,
                  table = 'recordings', 
                  dir.from = 'recording_drop', 
                  dir.to = 'recordings', 
                  token.path = 'settings/dropbox-token.RDS')
-#create templates
 
-setwd()
+#######create templates. run once, make sure to create a library beforehand for each new species added
 WOFRITemplate1 <- makeBinTemplate("WOFRITemplate1.WAV", 
                                   t.lim = c(241.59,241.69),
                                   frq.lim = c(0,6),
@@ -247,7 +245,7 @@ templatesInsert(db.path = db.path,
                 libraryID = 'BADOTemplate',
                 personID = 'ktolan@vtecostudies.org')
 
-#calculate scores
+#calculate scores on files both in given directory and in the recordings table
 ranscores <- scoresDetect(db.path = db.path, 
                           directory = 'recordings', 
                           recordingID = 'all',
