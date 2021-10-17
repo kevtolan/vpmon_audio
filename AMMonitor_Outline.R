@@ -11,21 +11,15 @@ ammCreateDirectories(amm.dir.name = "paste0(VPMonID,'_AMMonitor)",
 setwd('')
 
 # Create/save libraries and add metadata
-activity <- AMModels::amModelLib(description = "This library stores models that predict species activity patterns.")
 classifiers <- AMModels::amModelLib(description = "This library stores classification models (machine learning models) that can be used to predict the probability that a detected signal is from a target species.")
 soundscape <- AMModels::amModelLib(description = "This library stores results of a soundscape analysis.")
-do_fp <- AMModels::amModelLib(description = "This library stores results of dynamic occupancy analyses that can handle false positive detections.")
 info <- list(PI = 'Steve Faccio',
              Coordinator = 'Kevin Tolan',
              Organization = 'Vermont Center for Ecostudies')
-ammlInfo(activity) <- info
 ammlInfo(classifiers) <- info
 ammlInfo(soundscape) <- info
-ammlInfo(do_fp) <- info
-saveRDS(object = activity, file = "ammls/activity.RDS")
 saveRDS(object = classifiers, file = "ammls/classifiers.RDS")
 saveRDS(object = soundscape, file = "ammls/soundscape.RDS")
-saveRDS(object = do_fp, file = "ammls/do_fp.RDS")
 
 # create SQLite database
 dbCreate(db.name = paste0(VPMonID,".sqlite"), 
