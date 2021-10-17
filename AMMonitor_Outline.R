@@ -1,12 +1,13 @@
 library(AMMonitor)
 library(AMModels)
 
-#set vernal pool ID
+#set recorder ID
 VPMonID <- "ABC123"
 
 #create directories, reset WD
 ammCreateDirectories(amm.dir.name = "AMMonitor", 
                      file.path = "E:/Dropbox")
+
 setwd('')
 
 # Create a libraries
@@ -17,7 +18,7 @@ do_fp <- AMModels::amModelLib(description = "This library stores results of dyna
 
 # Create/add a list of metadata to be added to each library
 info <- list(PI = 'Steve Faccio',
-             Coordinator = 'Kevin Tolan'
+             Coordinator = 'Kevin Tolan',
              Organization = 'Vermont Center for Ecostudies')
 ammlInfo(activity) <- info
 ammlInfo(classifiers) <- info
@@ -31,7 +32,7 @@ saveRDS(object = do_fp, file = "ammls/do_fp.RDS")
 
 # create SQLite database
 dbCreate(db.name = paste0(VPMonID,".sqlite"), 
-               file.path = paste0(getwd(),"/database")) 
+         file.path = paste0(getwd(),"/database")) 
 ############################################################ FIX to paste poolID as sqlite
 #### ALWAYS RUN
 db.path <- paste0(getwd(), '/database/____.sqlite')
@@ -40,7 +41,7 @@ RSQLite::dbExecute(conn = conx, statement = "PRAGMA foreign_keys = ON;")
 
 #view tables
 dbReadTable(conx,people)
-   
+
 #### Add necessary components ####
 
 #people
@@ -143,25 +144,25 @@ RSQLite::dbWriteTable(conn = conx, name = 'accounts', value = new.account,
 RSQLite::dbExecute(conn = conx, statement = 
                      "ALTER TABLE equipment ADD COLUMN MicroSD varchar;") 
 new.equipment <- data.frame(equipmentID = '',
-                           accountID = paste0(VPMonID),
-                           microSD = '')
+                            accountID = paste0(VPMonID),
+                            microSD = '')
 RSQLite::dbWriteTable(conn = conx, name = 'equipment', value = new.equipment,
                       row.names = FALSE, overwrite = FALSE,
                       append = TRUE, header = FALSE)
 # deployment
 new.deployment <- data.frame(equipmentID = '',
-                            locationID = '',
-                            dateDeployed = '',
-                            dateRetrieved = NULL) # DON"T FILL IN DATE RETRIEVED
+                             locationID = '',
+                             dateDeployed = '',
+                             dateRetrieved = NULL) # DON"T FILL IN DATE RETRIEVED
 RSQLite::dbWriteTable(conn = conx, name = 'deployment', value = new.deployment,
                       row.names = FALSE, overwrite = FALSE,
                       append = TRUE, header = FALSE)
 # schedule
 new.schedule <- data.frame(equipmentID = '',
-                             locationID = '',
-                             subject = 'Vernal Pool',
-                             startDate = '',
-                             startTime = '') 
+                           locationID = '',
+                           subject = 'Vernal Pool',
+                           startDate = '',
+                           startTime = '') 
 RSQLite::dbWriteTable(conn = conx, name = 'schedule', value = new.schedule,
                       row.names = FALSE, overwrite = FALSE,
                       append = TRUE, header = FALSE)
@@ -236,20 +237,13 @@ templatesInsert(db.path = db.path,
 
 #calculate scores
 ranscores <- scoresDetect(db.path = db.path, 
-                      directory = 'recordings', 
-                      recordingID = 'all',
-                      templateID = 'all',
-                      score.thresholds = c(13,16,12,7,0.4),
-                      #listID = 'Target Species Templates',     
-                      token.path = 'settings/dropbox-token.RDS', 
-                      db.insert = TRUE) 
-
-
-
-
-
-
-
+                          directory = 'recordings', 
+                          recordingID = 'all',
+                          templateID = 'all',
+                          score.thresholds = c(13,16,12,7,0.4),
+                          #listID = 'Target Species Templates',     
+                          token.path = 'settings/dropbox-token.RDS', 
+                          db.insert = TRUE) 
 
 
 
