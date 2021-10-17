@@ -1,6 +1,5 @@
 library(AMMonitor)
 library(AMModels)
-library(taxize)
 
 #set vernal pool ID
 VPMonID <- "ABC123"
