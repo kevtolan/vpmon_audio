@@ -5,7 +5,7 @@ library(AMModels)
 VPMonID <- "ABC123"
 
 #create directories, reset WD
-ammCreateDirectories(amm.dir.name = "paste0(VPMonID)", 
+ammCreateDirectories(amm.dir.name = "paste0(VPMonID,'_AMMonitor)", 
                      file.path = "______")
 
 setwd('')
