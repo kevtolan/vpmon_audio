@@ -33,17 +33,16 @@ saveRDS(object = do_fp, file = "ammls/do_fp.RDS")
 # create SQLite database
 dbCreate(db.name = paste0(VPMonID,".sqlite"), 
                file.path = paste0(getwd(),"/database")) 
-
+############################################################ FIX to paste poolID as sqlite
 #### ALWAYS RUN
-db.path <- paste0(getwd(), '/database/Chap2.sqlite')
+db.path <- paste0(getwd(), '/database/____.sqlite')
 conx <- RSQLite::dbConnect(drv = dbDriver('SQLite'), dbname = db.path)
 RSQLite::dbExecute(conn = conx, statement = "PRAGMA foreign_keys = ON;")
 
+#view tables
 dbReadTable(conx,people)
    
-
-#### Add necessary components
-#view tables
+#### Add necessary components ####
 
 #people
 add.people <- data.frame(personID = 'ktolan@vtecostudies.org',
