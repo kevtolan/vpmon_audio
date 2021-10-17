@@ -5,8 +5,8 @@ library(AMModels)
 VPMonID <- "ABC123"
 
 #create directories, reset WD
-ammCreateDirectories(amm.dir.name = "AMMonitor", 
-                     file.path = "E:/Dropbox")
+ammCreateDirectories(amm.dir.name = "paste0(VPMonID)", 
+                     file.path = "______")
 
 setwd('')
 
@@ -139,7 +139,8 @@ RSQLite::dbWriteTable(conn = conx, name = 'library', value = new.library,
                       row.names = FALSE, overwrite = FALSE,
                       append = TRUE, header = FALSE)
 # location
-new.location <- data.frame(locationID = paste0(VPMonID),
+new.location <- data.frame(locationID = 
+                           0(VPMonID),
                            type = 'Vernal Pool ARU',
                            lat = '',
                            long = '',
