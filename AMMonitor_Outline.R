@@ -92,6 +92,16 @@ new.species <- data.frame(speciesID = 'ewpw',
 RSQLite::dbWriteTable(conn = conx, name = 'species', value = new.species,
                       row.names = FALSE, overwrite = FALSE,
                       append = TRUE, header = FALSE)
+new.species <- data.frame(speciesID = 'easo', 
+                          commonName = 'Eastern Screech-Owl',
+                          ITIS = '686658',
+                          genus = 'Megascops',
+                          species = 'asio',
+                          notes = NA, 
+                          stringsAsFactors = FALSE)
+RSQLite::dbWriteTable(conn = conx, name = 'species', value = new.species,
+                      row.names = FALSE, overwrite = FALSE,
+                      append = TRUE, header = FALSE)
 #library
 new.library <- data.frame(speciesID = 'wofr', 
                           speciesID = 'wofr',
@@ -116,7 +126,14 @@ RSQLite::dbWriteTable(conn = conx, name = 'library', value = new.library,
                       append = TRUE, header = FALSE)
 new.library <- data.frame(speciesID = 'ewpw', 
                           speciesID = 'ewpw',
-                          type = 'Song',
+                          type = 'Classic song',
+                          desription = NULL)
+RSQLite::dbWriteTable(conn = conx, name = 'library', value = new.library,
+                      row.names = FALSE, overwrite = FALSE,
+                      append = TRUE, header = FALSE)
+new.library <- data.frame(speciesID = 'easo', 
+                          speciesID = 'easo',
+                          type = 'Hoot',
                           desription = NULL)
 RSQLite::dbWriteTable(conn = conx, name = 'library', value = new.library,
                       row.names = FALSE, overwrite = FALSE,
@@ -210,17 +227,20 @@ SPPEITemplate  <- makeBinTemplate("SPPEITemplate.wav",
                                   score.cutoff = 0,
                                   buffer = 1,
                                   name = "SPPEITemplate")
-EWPWTemplate <- makeBinTemplate("EWPWTemplate.WAV",
-                                amp.cutoff = -40, 
-                                score.cutoff = 0,
-                                frq.lim = c(0,6),
-                                name = "EWPWTemplate")
+EWPWTemplate <- makeBinTemplate(EWPWTemplate.WAV",
+### add EWPW template
+                                
+                              
+EASOTemplate <- makeBinTemplate(EASOTemplate.WAV",
+### add EASO template
+
+
 BADOTemplate <- makeCorTemplate("BADOTemplate.wav",
                                 t.lim = c(2.65,3.35),
                                 frq.lim = c(0.25,2.5),
                                 score.cutoff = 0,
                                 name="BADOTemplate")
-BinTemplateList <- combineBinTemplates(WOFRITemplate1,WOFRITemplate2,WOFRITemplate3,SPPEITemplate,EWPWTemplate)
+BinTemplateList <- combineBinTemplates(WOFRITemplate1,WOFRITemplate2,WOFRITemplate3,SPPEITemplate,EWPWTemplate,EASOTemplate)
 CorTemplateList <- combineCorTemplates(BADOTemplate)
 
 templatesInsert(db.path = db.path, 
@@ -237,7 +257,7 @@ ranscores <- scoresDetect(db.path = db.path,
                           directory = 'recordings', 
                           recordingID = 'all',
                           templateID = 'all',
-                          score.thresholds = c(13,16,12,7,0.4),
+                          score.thresholds = c(13,16,12,7,____,0.4),
                           #listID = 'Target Species Templates',     
                           token.path = 'settings/dropbox-token.RDS', 
                           db.insert = TRUE) 
