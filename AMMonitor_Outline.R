@@ -2,6 +2,7 @@ library(AMMonitor)
 library(AMModels)
 library(lubridate)
 library(stringr)
+library(soundecology)
 
 #set recorder ID
 VPMonID <- 'ABC' #Pool ID
@@ -261,4 +262,28 @@ ranscores <- scoresDetect(db.path = db.path,
 
 
 write.csv(ranscores,'Scores.csv', append = FALSE)
+
+
+
+#sound scape
+
+dropboxGetOneFile(
+  file = '.wav', 
+  directory = 'recordings', 
+  token.path = 'settings/dropbox-token.RDS', 
+  local.directory = getwd())
+
+wav1 <- tuneR::readWave(filename = '.wav')
+soundecology::acoustic_complexity(soundfile = wav1)
+
+AMMonitor::soundscape(db.path = db.path,
+                      recordingID = 'midEarth4_2016-03-04_06-00-00.wav',
+                      directory = 'recordings', 
+                      token.path = 'settings/dropbox-token.RDS', 
+                      db.insert = TRUE)
+
+
+
+
+
 
