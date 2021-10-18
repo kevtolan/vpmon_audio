@@ -5,7 +5,7 @@ library(stringr)
 library(soundecology)
 
 #set recorder ID
-VPMonID <- 'ABC' #Pool ID
+VPMonID <- 'SDF791' #Pool ID
 equipID <- '21N' #recorder ID
 depoyDay <- '2021-03-25' #date deployed
 
@@ -270,7 +270,7 @@ dropboxGetOneFile(
   local.directory = getwd())
 
 wavSample <- tuneR::readWave(filename = '.wav')
-soundecology::acoustic_complexity(soundfile = wav1)
+soundecology::acoustic_complexity(soundfile = wavSample)
 
 AMMonitor::soundscape(db.path = db.path,
                       recordingID = wavSample,
