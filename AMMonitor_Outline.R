@@ -220,11 +220,13 @@ SPPEITemplate  <- makeBinTemplate("SPPEITemplate.wav",
                                   score.cutoff = 0,
                                   buffer = 1,
                                   name = "SPPEITemplate")
-EWPWTemplate <- makeBinTemplate(EWPWTemplate.WAV",
-### add EWPW template
-                                
+EWPWTemplate2 <- makeBinTemplate("EWPWTemplate.wav",
+                                 amp.cutoff = -20, 
+                                 score.cutoff = 10,
+                                 frq.lim = c(1,5),
+                                 name = "EWPWTemplate2")    
                               
-EASOTemplate <- makeBinTemplate(EASOTemplate.WAV",
+#EASOTemplate <- makeBinTemplate(EASOTemplate.WAV",
 ### add EASO template
 
 
