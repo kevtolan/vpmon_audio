@@ -1,46 +1,53 @@
 library(AMMonitor)
 library(AMModels)
+library(lubridate)
+library(stringr)
 
 #set recorder ID
-VPMonID <- "ABC123"
+VPMonID <- 'SDF791' #Pool ID
 
-#create directories, reset WD, run once
-ammCreateDirectories(amm.dir.name = "paste0(VPMonID,'_AMMonitor)", 
-                     file.path = "______")
+#create directories, resetWD
+ammCreateDirectories(amm.dir.name = "AMMonitor", 
+                     file.path = "C:/Dropbox")
 
-setwd('')
+setwd('C:/Dropbox')
 
-# Create/save libraries and add metadata, run once
+# Create/save libraries and add metadata
+activity <- AMModels::amModelLib(description = "This library stores models that predict species activity patterns.")
 classifiers <- AMModels::amModelLib(description = "This library stores classification models (machine learning models) that can be used to predict the probability that a detected signal is from a target species.")
 soundscape <- AMModels::amModelLib(description = "This library stores results of a soundscape analysis.")
+do_fp <- AMModels::amModelLib(description = "This library stores results of dynamic occupancy analyses that can handle false positive detections.")
 info <- list(PI = 'Steve Faccio',
              Coordinator = 'Kevin Tolan',
              Organization = 'Vermont Center for Ecostudies')
+ammlInfo(activity) <- info
 ammlInfo(classifiers) <- info
 ammlInfo(soundscape) <- info
+ammlInfo(do_fp) <- info
+saveRDS(object = activity, file = "ammls/activity.RDS")
 saveRDS(object = classifiers, file = "ammls/classifiers.RDS")
 saveRDS(object = soundscape, file = "ammls/soundscape.RDS")
+saveRDS(object = do_fp, file = "ammls/do_fp.RDS")
 
 # create SQLite database
-dbCreate(db.name = paste0(VPMonID,".sqlite"), 
+dbCreate(db.name = paste0(VPMonID,'_________.sqlite'), 
          file.path = paste0(getwd(),"/database")) 
-############################################################ FIX to paste poolID as sqlite
 #### ALWAYS RUN
-db.path <- paste0(getwd(), '/database/____.sqlite')
+db.path <- '_________.sqlite'
 conx <- RSQLite::dbConnect(drv = dbDriver('SQLite'), dbname = db.path)
 RSQLite::dbExecute(conn = conx, statement = "PRAGMA foreign_keys = ON;")
 
 #view tables
 dbReadTable(conx,people)
 
-#### Add necessary components ####, run once per record added
+#### Add necessary components ####
+
 #people
 add.people <- data.frame(personID = 'ktolan@vtecostudies.org',
                          firstName = 'Kevin',
                          lastName = 'Tolan',
                          projectRole = 'Coordinator',
-                         email = 'ktolan@vtecostudies.org',
-                         phone = NULL )
+                         email = 'ktolan@vtecostudies.org')
 RSQLite::dbWriteTable(conn = conx, name = 'people', value = add.people,
                       row.names = FALSE, overwrite = FALSE,
                       append = TRUE, header = FALSE)
@@ -96,51 +103,50 @@ RSQLite::dbWriteTable(conn = conx, name = 'species', value = new.species,
                       row.names = FALSE, overwrite = FALSE,
                       append = TRUE, header = FALSE)
 #library
-new.library <- data.frame(speciesID = 'wofr', 
+new.library <- data.frame(libraryID = 'wofr', 
                           speciesID = 'wofr',
-                          type = NULL,
-                          desription = NULL)
+                          type = NA,
+                          description = NA)
 RSQLite::dbWriteTable(conn = conx, name = 'library', value = new.library,
                       row.names = FALSE, overwrite = FALSE,
                       append = TRUE, header = FALSE)
-new.library <- data.frame(speciesID = 'sppe', 
+new.library <- data.frame(libraryID = 'sppe', 
                           speciesID = 'sppe',
-                          type = NULL,
-                          desription = NULL)
+                          type = NA,
+                          description = NA)
 RSQLite::dbWriteTable(conn = conx, name = 'library', value = new.library,
                       row.names = FALSE, overwrite = FALSE,
                       append = TRUE, header = FALSE)
-new.library <- data.frame(speciesID = 'bado', 
+new.library <- data.frame(libraryID = 'bado', 
                           speciesID = 'bado',
                           type = 'Hoot',
-                          desription = NULL)
+                          description = NA)
 RSQLite::dbWriteTable(conn = conx, name = 'library', value = new.library,
                       row.names = FALSE, overwrite = FALSE,
                       append = TRUE, header = FALSE)
-new.library <- data.frame(speciesID = 'ewpw', 
+new.library <- data.frame(libraryID = 'ewpw', 
                           speciesID = 'ewpw',
                           type = 'Classic song',
-                          desription = NULL)
+                          description = NA)
 RSQLite::dbWriteTable(conn = conx, name = 'library', value = new.library,
                       row.names = FALSE, overwrite = FALSE,
                       append = TRUE, header = FALSE)
-new.library <- data.frame(speciesID = 'easo', 
+new.library <- data.frame(libraryID = 'easo', 
                           speciesID = 'easo',
                           type = 'Hoot',
-                          desription = NULL)
+                          description = NA)
 RSQLite::dbWriteTable(conn = conx, name = 'library', value = new.library,
                       row.names = FALSE, overwrite = FALSE,
                       append = TRUE, header = FALSE)
 # location
-new.location <- data.frame(locationID = 
-                           0(VPMonID),
+new.location <- data.frame(locationID = paste0(VPMonID),
                            type = 'Vernal Pool ARU',
-                           lat = '',
-                           long = '',
+                           lat = '44',
+                           long = '72',
                            datum = 'WGS84',
                            tz = 'UTC',
-                           personID = '')
-RSQLite::dbWriteTable(conn = conx, name = 'location', value = new.location,
+                           personID = 'ktolan@vtecostudies.org')
+RSQLite::dbWriteTable(conn = conx, name = 'locations', value = new.location,
                       row.names = FALSE, overwrite = FALSE,
                       append = TRUE, header = FALSE)
 # accounts
@@ -149,50 +155,49 @@ RSQLite::dbWriteTable(conn = conx, name = 'accounts', value = new.account,
                       row.names = FALSE, overwrite = FALSE,
                       append = TRUE, header = FALSE)
 # equipment
-RSQLite::dbExecute(conn = conx, statement = 
-                     "ALTER TABLE equipment ADD COLUMN MicroSD varchar;") 
 new.equipment <- data.frame(equipmentID = '',
-                            accountID = paste0(VPMonID),
-                            microSD = '')
+                            accountID = paste0(VPMonID)) 
 RSQLite::dbWriteTable(conn = conx, name = 'equipment', value = new.equipment,
                       row.names = FALSE, overwrite = FALSE,
                       append = TRUE, header = FALSE)
 # deployment
 new.deployment <- data.frame(equipmentID = '',
-                             locationID = '',
+                             locationID = paste0(VPMonID),
                              dateDeployed = '',
-                             dateRetrieved = NULL) # DON"T FILL IN DATE RETRIEVED
+                             dateRetrieved = NA)
 RSQLite::dbWriteTable(conn = conx, name = 'deployment', value = new.deployment,
                       row.names = FALSE, overwrite = FALSE,
                       append = TRUE, header = FALSE)
 # schedule
 new.schedule <- data.frame(equipmentID = '',
-                           locationID = '',
+                           locationID = paste0(VPMonID),
                            subject = 'Vernal Pool',
                            startDate = '',
                            startTime = '') 
 RSQLite::dbWriteTable(conn = conx, name = 'schedule', value = new.schedule,
                       row.names = FALSE, overwrite = FALSE,
                       append = TRUE, header = FALSE)
-# file rename. put any files u want run into the recoring_drop folder. ensure in proper format, this is good for AudioMoths
+# file rename
 AudioFiles <- list.files(path = "recording_drop", pattern = ".WAV", all.files = TRUE,
                          full.names = TRUE, recursive = TRUE,
                          ignore.case = TRUE, include.dirs = TRUE)
+AudioFiles <- '20200318 015000.wav'
 AudioFiles2 <- parse_date_time(AudioFiles, "Ymd HMS", tz = 'UTC')
 AudioFiles3 <- as.character(AudioFiles2)
 AudioFiles4 <- str_replace_all(AudioFiles3,' ','_')
 AudioFiles5 <- str_replace_all(AudioFiles4,':','-')
-AudioFiles6 <- paste0(VPMonID, AudioFiles5)
+AudioFiles6 <- paste0('~',VPMonID,'_',AudioFiles5)
 AudioFiles7 <- str_replace_all(AudioFiles6,'~','recording_drop/')
 AudioFiles8 <- file.rename(AudioFiles,paste0(AudioFiles7,'.wav'))
-# fill recordings table with files recording_drop, moves them to recordings
+
+# fill recordings table
 dropboxMoveBatch(db.path = db.path,
                  table = 'recordings', 
                  dir.from = 'recording_drop', 
                  dir.to = 'recordings', 
                  token.path = 'settings/dropbox-token.RDS')
-
-#######create templates. run once, make sure to create a library beforehand for each new species added
+#create templates 
+setwd('E:/Dropbox/AudioTemplates')
 WOFRITemplate1 <- makeBinTemplate("WOFRITemplate1.WAV", 
                                   t.lim = c(241.59,241.69),
                                   frq.lim = c(0,6),
@@ -220,15 +225,12 @@ SPPEITemplate  <- makeBinTemplate("SPPEITemplate.wav",
                                   score.cutoff = 0,
                                   buffer = 1,
                                   name = "SPPEITemplate")
-EWPWTemplate2 <- makeBinTemplate("EWPWTemplate.wav",
+EWPWTemplate <- makeBinTemplate("EWPWTemplate.wav",
                                  amp.cutoff = -20, 
-                                 score.cutoff = 10,
+                                 score.cutoff = 0,
                                  frq.lim = c(1,5),
-                                 name = "EWPWTemplate2")    
-                              
-#EASOTemplate <- makeBinTemplate(EASOTemplate.WAV",
+                                 name = "EWPWTemplate")
 ### add EASO template
-
 
 BADOTemplate <- makeCorTemplate("BADOTemplate.wav",
                                 t.lim = c(2.65,3.35),
@@ -240,23 +242,23 @@ CorTemplateList <- combineCorTemplates(BADOTemplate)
 
 templatesInsert(db.path = db.path, 
                 template.list = combineBinTemplates(WOFRITemplate1,WOFRITemplate2,WOFRITemplate3,SPPEITemplate,EWPWTemplate), 
-                libraryID = c(combineBinTemplates('WOFRITemplate1','WOFRITemplate2','WOFRITemplate3','SPPEITemplate','EWPWTemplate')),
+                libraryID = c('wofr','wofr','wofr','sppe','ewpw'),
                 personID = 'ktolan@vtecostudies.org')
 templatesInsert(db.path = db.path, 
                 template.list = BADOTemplate, 
-                libraryID = 'BADOTemplate',
+                libraryID = 'bado',
                 personID = 'ktolan@vtecostudies.org')
 
-#calculate scores on files both in given directory and in the recordings table
+#calculate scores
 ranscores <- scoresDetect(db.path = db.path, 
                           directory = 'recordings', 
                           recordingID = 'all',
                           templateID = 'all',
-                          score.thresholds = c(13,16,12,7,__,__,0.4),
+                          score.thresholds = c(13,16,12,10,0.4),
                           #listID = 'Target Species Templates',     
                           token.path = 'settings/dropbox-token.RDS', 
                           db.insert = TRUE) 
 
 
-
+write.csv(ranscores,'Scores.csv', append = FALSE)
 
