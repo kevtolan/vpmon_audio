@@ -4,7 +4,7 @@ library(lubridate)
 library(stringr)
 
 #set recorder ID
-VPMonID <- 'SDF791' #Pool ID
+VPMonID <- 'ABC' #Pool ID
 
 #create directories, resetWD
 ammCreateDirectories(amm.dir.name = "AMMonitor", 
@@ -30,7 +30,7 @@ saveRDS(object = soundscape, file = "ammls/soundscape.RDS")
 saveRDS(object = do_fp, file = "ammls/do_fp.RDS")
 
 # create SQLite database
-dbCreate(db.name = paste0(VPMonID,'_________.sqlite'), 
+dbCreate(db.name = paste0(VPMonID,'.sqlite'), 
          file.path = paste0(getwd(),"/database")) 
 #### ALWAYS RUN
 db.path <- '_________.sqlite'
@@ -141,8 +141,8 @@ RSQLite::dbWriteTable(conn = conx, name = 'library', value = new.library,
 # location
 new.location <- data.frame(locationID = paste0(VPMonID),
                            type = 'Vernal Pool ARU',
-                           lat = '44',
-                           long = '72',
+                           lat = '1',
+                           long = '1',
                            datum = 'WGS84',
                            tz = 'UTC',
                            personID = 'ktolan@vtecostudies.org')
@@ -178,10 +178,10 @@ RSQLite::dbWriteTable(conn = conx, name = 'schedule', value = new.schedule,
                       row.names = FALSE, overwrite = FALSE,
                       append = TRUE, header = FALSE)
 # file rename
+# format 'yyyymmdd hhmmss.wav'
 AudioFiles <- list.files(path = "recording_drop", pattern = ".WAV", all.files = TRUE,
                          full.names = TRUE, recursive = TRUE,
                          ignore.case = TRUE, include.dirs = TRUE)
-AudioFiles <- '20200318 015000.wav'
 AudioFiles2 <- parse_date_time(AudioFiles, "Ymd HMS", tz = 'UTC')
 AudioFiles3 <- as.character(AudioFiles2)
 AudioFiles4 <- str_replace_all(AudioFiles3,' ','_')
@@ -230,6 +230,12 @@ EWPWTemplate <- makeBinTemplate("EWPWTemplate.wav",
                                  score.cutoff = 0,
                                  frq.lim = c(1,5),
                                  name = "EWPWTemplate")
+BinTemplateList <- combineBinTemplates(WOFRITemplate1,WOFRITemplate2,WOFRITemplate3,SPPEITemplate,EWPWTemplate,EASOTemplate)
+templatesInsert(db.path = db.path, 
+                template.list = combineBinTemplates(WOFRITemplate1,WOFRITemplate2,WOFRITemplate3,SPPEITemplate,EWPWTemplate), 
+                libraryID = c('wofr','wofr','wofr','sppe','ewpw'),
+                personID = 'ktolan@vtecostudies.org')
+
 ### add EASO template
 
 BADOTemplate <- makeCorTemplate("BADOTemplate.wav",
@@ -237,13 +243,7 @@ BADOTemplate <- makeCorTemplate("BADOTemplate.wav",
                                 frq.lim = c(0.25,2.5),
                                 score.cutoff = 0,
                                 name="BADOTemplate")
-BinTemplateList <- combineBinTemplates(WOFRITemplate1,WOFRITemplate2,WOFRITemplate3,SPPEITemplate,EWPWTemplate,EASOTemplate)
 CorTemplateList <- combineCorTemplates(BADOTemplate)
-
-templatesInsert(db.path = db.path, 
-                template.list = combineBinTemplates(WOFRITemplate1,WOFRITemplate2,WOFRITemplate3,SPPEITemplate,EWPWTemplate), 
-                libraryID = c('wofr','wofr','wofr','sppe','ewpw'),
-                personID = 'ktolan@vtecostudies.org')
 templatesInsert(db.path = db.path, 
                 template.list = BADOTemplate, 
                 libraryID = 'bado',
